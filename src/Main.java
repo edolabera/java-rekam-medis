@@ -14,6 +14,19 @@ import javax.swing.JOptionPane;
  */
 public class Main extends javax.swing.JFrame {
     FormPengguna frmPengguna;
+    FormLogin frmLogin;
+    
+    private static boolean loggedIn = false;
+
+    public static boolean isLoggedIn() {
+        return loggedIn;
+    }
+
+    public static void setLoggedIn(boolean loggedIn) {
+        Main.loggedIn = loggedIn;
+    }
+    
+    
     
     /**
      * Creates new form Main
@@ -25,8 +38,11 @@ public class Main extends javax.swing.JFrame {
     }
     
     private void initState() {
-        sbLogout.setEnabled(false);
-        // ..
+        sbLogout.setEnabled(loggedIn);
+        sbLogin.setEnabled(!loggedIn);
+        mnMaster.setVisible(loggedIn);
+        mnTransaksi.setVisible(loggedIn);
+        mnLaporan.setVisible(loggedIn);
     }
 
     /**
@@ -45,19 +61,19 @@ public class Main extends javax.swing.JFrame {
         sbLogout = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         smExit = new javax.swing.JMenuItem();
-        smPegawai = new javax.swing.JMenu();
+        mnMaster = new javax.swing.JMenu();
         smPasien = new javax.swing.JMenuItem();
         smDokter = new javax.swing.JMenuItem();
         smObat = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         smPetugas = new javax.swing.JMenuItem();
-        jMenu3 = new javax.swing.JMenu();
+        mnTransaksi = new javax.swing.JMenu();
         smPendaftaran = new javax.swing.JMenuItem();
         smPemeriksaan = new javax.swing.JMenuItem();
         smPembayaran = new javax.swing.JMenuItem();
         smResep = new javax.swing.JMenuItem();
-        jMenu4 = new javax.swing.JMenu();
+        mnLaporan = new javax.swing.JMenu();
         smLapDokter = new javax.swing.JMenuItem();
         smLapObat = new javax.swing.JMenuItem();
         smLapPetugas = new javax.swing.JMenuItem();
@@ -76,9 +92,19 @@ public class Main extends javax.swing.JFrame {
         jMenu1.setText("File");
 
         sbLogin.setText("Login");
+        sbLogin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sbLoginActionPerformed(evt);
+            }
+        });
         jMenu1.add(sbLogin);
 
         sbLogout.setText("Logout");
+        sbLogout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sbLogoutActionPerformed(evt);
+            }
+        });
         jMenu1.add(sbLogout);
         jMenu1.add(jSeparator1);
 
@@ -92,20 +118,20 @@ public class Main extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu1);
 
-        smPegawai.setText("Master");
+        mnMaster.setText("Master");
 
         smPasien.setText("Pasien");
-        smPegawai.add(smPasien);
+        mnMaster.add(smPasien);
 
         smDokter.setText("Dokter");
-        smPegawai.add(smDokter);
+        mnMaster.add(smDokter);
 
         smObat.setText("Obat");
-        smPegawai.add(smObat);
+        mnMaster.add(smObat);
 
         jMenuItem1.setText("Pegawai");
-        smPegawai.add(jMenuItem1);
-        smPegawai.add(jSeparator2);
+        mnMaster.add(jMenuItem1);
+        mnMaster.add(jSeparator2);
 
         smPetugas.setText("Pengguna");
         smPetugas.addActionListener(new java.awt.event.ActionListener() {
@@ -113,54 +139,54 @@ public class Main extends javax.swing.JFrame {
                 smPetugasActionPerformed(evt);
             }
         });
-        smPegawai.add(smPetugas);
+        mnMaster.add(smPetugas);
 
-        jMenuBar1.add(smPegawai);
+        jMenuBar1.add(mnMaster);
 
-        jMenu3.setText("Transaksi");
+        mnTransaksi.setText("Transaksi");
 
         smPendaftaran.setText("Pendaftaran");
-        jMenu3.add(smPendaftaran);
+        mnTransaksi.add(smPendaftaran);
 
         smPemeriksaan.setText("Pemeriksaan");
-        jMenu3.add(smPemeriksaan);
+        mnTransaksi.add(smPemeriksaan);
 
         smPembayaran.setText("Pembayaran");
-        jMenu3.add(smPembayaran);
+        mnTransaksi.add(smPembayaran);
 
         smResep.setText("Resep");
-        jMenu3.add(smResep);
+        mnTransaksi.add(smResep);
 
-        jMenuBar1.add(jMenu3);
+        jMenuBar1.add(mnTransaksi);
 
-        jMenu4.setText("Laporan");
+        mnLaporan.setText("Laporan");
 
         smLapDokter.setText("Laporan Data Pasien");
-        jMenu4.add(smLapDokter);
+        mnLaporan.add(smLapDokter);
 
         smLapObat.setText("Laporan Data Dokter");
-        jMenu4.add(smLapObat);
+        mnLaporan.add(smLapObat);
 
         smLapPetugas.setText("Laporan Data Obat");
-        jMenu4.add(smLapPetugas);
+        mnLaporan.add(smLapPetugas);
 
         smLapPendaftaran.setText("Laporan Data Petugas");
-        jMenu4.add(smLapPendaftaran);
-        jMenu4.add(jSeparator3);
+        mnLaporan.add(smLapPendaftaran);
+        mnLaporan.add(jSeparator3);
 
         smLapPemeriksaan.setText("Laporan Pendaftaran");
-        jMenu4.add(smLapPemeriksaan);
+        mnLaporan.add(smLapPemeriksaan);
 
         smLapPembayaran.setText("Laporan Pemeriksaan");
-        jMenu4.add(smLapPembayaran);
+        mnLaporan.add(smLapPembayaran);
 
         smLapResep.setText("Laporan Pembayaran");
-        jMenu4.add(smLapResep);
+        mnLaporan.add(smLapResep);
 
         jMenuItem20.setText("Laporan Resep");
-        jMenu4.add(jMenuItem20);
+        mnLaporan.add(jMenuItem20);
 
-        jMenuBar1.add(jMenu4);
+        jMenuBar1.add(mnLaporan);
 
         setJMenuBar(jMenuBar1);
 
@@ -194,6 +220,19 @@ public class Main extends javax.swing.JFrame {
         }
         frmPengguna.setVisible(true);
     }//GEN-LAST:event_smPetugasActionPerformed
+
+    private void sbLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sbLoginActionPerformed
+        if (frmLogin == null) {
+            frmLogin = new FormLogin(this, true);
+        }
+        frmLogin.setVisible(true);
+        initState();
+    }//GEN-LAST:event_sbLoginActionPerformed
+
+    private void sbLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sbLogoutActionPerformed
+        setLoggedIn(false);
+        initState();
+    }//GEN-LAST:event_sbLogoutActionPerformed
 
     /**
      * @param args the command line arguments
@@ -232,8 +271,6 @@ public class Main extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu3;
-    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem17;
@@ -241,6 +278,9 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
+    private javax.swing.JMenu mnLaporan;
+    private javax.swing.JMenu mnMaster;
+    private javax.swing.JMenu mnTransaksi;
     private javax.swing.JMenuItem sbLogin;
     private javax.swing.JMenuItem sbLogout;
     private javax.swing.JMenuItem smDokter;
@@ -254,7 +294,6 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JMenuItem smLapResep;
     private javax.swing.JMenuItem smObat;
     private javax.swing.JMenuItem smPasien;
-    private javax.swing.JMenu smPegawai;
     private javax.swing.JMenuItem smPembayaran;
     private javax.swing.JMenuItem smPemeriksaan;
     private javax.swing.JMenuItem smPendaftaran;
