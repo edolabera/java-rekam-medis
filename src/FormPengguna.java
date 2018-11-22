@@ -1,6 +1,15 @@
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -15,6 +24,7 @@ import java.util.List;
 public class FormPengguna extends javax.swing.JDialog {
     
     List<Pengguna> listPengguna = new ArrayList<>();
+    private boolean isEdit = false;
 
     /**
      * Creates new form FormPengguna
@@ -23,8 +33,7 @@ public class FormPengguna extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         setLocationRelativeTo(this);
-        initState();
-        tampilData();
+        initState();        
     }
 
     /**
@@ -45,7 +54,6 @@ public class FormPengguna extends javax.swing.JDialog {
         txtPengguna = new javax.swing.JTextField();
         txtUsername = new javax.swing.JTextField();
         txtPassword = new javax.swing.JPasswordField();
-        txtPasswordKonfirmasi = new javax.swing.JPasswordField();
         btnTambah = new javax.swing.JButton();
         btnSimpan = new javax.swing.JButton();
         btnEdit = new javax.swing.JButton();
@@ -56,6 +64,8 @@ public class FormPengguna extends javax.swing.JDialog {
         txtCari = new javax.swing.JTextField();
         btnResetCari = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
+        txtId = new javax.swing.JTextField();
+        cmbPegawai = new javax.swing.JComboBox<>();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -79,7 +89,7 @@ public class FormPengguna extends javax.swing.JDialog {
 
         jLabel3.setText("Password");
 
-        jLabel4.setText("Password Konfirmasi");
+        jLabel4.setText("ID");
 
         btnTambah.setText("Tambah");
         btnTambah.addActionListener(new java.awt.event.ActionListener() {
@@ -96,6 +106,11 @@ public class FormPengguna extends javax.swing.JDialog {
         });
 
         btnEdit.setText("Edit");
+        btnEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditActionPerformed(evt);
+            }
+        });
 
         btnHapus.setText("Hapus");
         btnHapus.addActionListener(new java.awt.event.ActionListener() {
@@ -115,6 +130,11 @@ public class FormPengguna extends javax.swing.JDialog {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblPengguna.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblPenggunaMouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(tblPengguna);
 
         btnCari.setText("Cari");
@@ -131,6 +151,8 @@ public class FormPengguna extends javax.swing.JDialog {
             }
         });
 
+        cmbPegawai.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -138,40 +160,46 @@ public class FormPengguna extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel2))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtPengguna, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(75, 75, 75)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel3))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtPasswordKonfirmasi, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(btnTambah)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnSimpan)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnEdit)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnHapus)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(txtCari, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel2))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(cmbPegawai, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnCari, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnResetCari)))
+                        .addComponent(txtPengguna, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel3)))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txtPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE)
+                    .addComponent(txtUsername))
                 .addContainerGap())
             .addComponent(jSeparator1)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnTambah)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnSimpan)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnEdit)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnHapus)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 146, Short.MAX_VALUE)
+                .addComponent(txtCari, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnCari, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnResetCari)
+                .addGap(12, 12, 12))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addComponent(jScrollPane2)
+                .addGap(12, 12, 12))
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnEdit, btnHapus, btnSimpan, btnTambah});
@@ -182,17 +210,20 @@ public class FormPengguna extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(txtPengguna, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3)
-                    .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel2)
+                        .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel4)
+                        .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4)
-                    .addComponent(txtPasswordKonfirmasi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel3)
+                    .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1)
+                    .addComponent(txtPengguna, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbPegawai, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -216,41 +247,109 @@ public class FormPengguna extends javax.swing.JDialog {
         SwingUtil swingUtil = new SwingUtil();
         swingUtil.setActive(true, txtPengguna, txtUsername);
         txtPassword.setEnabled(true);
-        txtPasswordKonfirmasi.setEnabled(true);
-        
+        txtId.setEnabled(true);
+        cmbPegawai.setEnabled(true);
         btnSimpan.setEnabled(true);
+        isEdit = false;
     }//GEN-LAST:event_btnTambahActionPerformed
 
     private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
-        String nama = txtPengguna.getText();
         String username = txtUsername.getText();
-        String password = String.valueOf(txtPassword.getPassword());
-        Pengguna pengguna = new Pengguna(nama, username, password);
+        String password = String.valueOf(txtPassword.getPassword());               
         
-        listPengguna.add(pengguna);
-        tblPengguna.setModel(new TableModelPengguna(listPengguna));
+        
+        if (isEdit) {
+            int id = Integer.parseInt(txtId.getText());
+            Connection conn = DBConnection.getInstance().getConnection();
+            String sql = "UPDATE user SET username = ?, password = sha1(?) WHERE id = ?";
+            try {
+                PreparedStatement st = conn.prepareStatement(sql);
+                st.setString(1, username);
+                st.setString(2, password);
+                st.setInt(3, id);
+                st.executeUpdate();                
+            } catch (SQLException ex) {
+                Logger.getLogger(FormPengguna.class.getName()).log(Level.SEVERE, null, ex);
+            } 
+        } else {
+            int idPegawai = Integer.parseInt(cmbPegawai.getSelectedItem().toString());
+            Connection conn = DBConnection.getInstance().getConnection();
+            String sql = "INSERT INTO user (username, password, id_pegawai) VALUES (?, ?, ?)";
+            try {
+                PreparedStatement st = conn.prepareStatement(sql);
+                st.setString(1, username);
+                st.setString(2, password);
+                st.setInt(3, idPegawai);
+                st.executeUpdate();
+                initState();
+            } catch (SQLException ex) {
+                Logger.getLogger(FormPengguna.class.getName()).log(Level.SEVERE, null, ex);
+            } 
+        }
         
         initState();
     }//GEN-LAST:event_btnSimpanActionPerformed
 
     private void btnCariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCariActionPerformed
         List<Pengguna> filterPengguna = new ArrayList<>();
-        for (Pengguna pengguna : listPengguna) {
-            if (pengguna.getNama().contains(txtCari.getText())) {
-                filterPengguna.add(pengguna);
-            }
-        }
         
-        tblPengguna.setModel(new TableModelPengguna(filterPengguna));
+        Connection conn = DBConnection.getInstance().getConnection();
+        String sql = "SELECT u.*, nama FROM user u INNER JOIN pegawai p ON u.id_pegawai = p.id ORDER BY username ASC";
+        try {
+            PreparedStatement st = conn.prepareStatement(sql);
+            st.setString(1, '%' + txtCari.getText() + '%');
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                Pengguna user = new Pengguna(rs.getInt("id"), rs.getString("nama"), rs.getString("username"));
+                filterPengguna.add(user);
+            }
+            tblPengguna.setModel(new TableModelPengguna(filterPengguna));
+        } catch (SQLException ex) {
+            Logger.getLogger(FormPengguna.class.getName()).log(Level.SEVERE, null, ex);
+        }               
     }//GEN-LAST:event_btnCariActionPerformed
 
     private void btnResetCariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetCariActionPerformed
         txtCari.setText("");
+        tampilData();
     }//GEN-LAST:event_btnResetCariActionPerformed
 
     private void btnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusActionPerformed
-        // TODO add your handling code here:
+        if (txtId.getText().length() > 0) {
+            int jawab = JOptionPane.showConfirmDialog(this, "Anda yakin akan menghapus data ini?", "Konfirmasi Hapus", JOptionPane.OK_CANCEL_OPTION);
+            if (jawab == JOptionPane.OK_OPTION) {
+                Connection conn = DBConnection.getInstance().getConnection();
+                String sql = "DELETE FROM user WHERE id = ?";
+                try {
+                    PreparedStatement st = conn.prepareStatement(sql);
+                    st.setInt(1, Integer.parseInt(txtId.getText()));
+                    st.executeUpdate();
+                    initState();
+                } catch (SQLException ex) {
+                    Logger.getLogger(FormPengguna.class.getName()).log(Level.SEVERE, null, ex);
+                }  
+            }
+        }
     }//GEN-LAST:event_btnHapusActionPerformed
+
+    private void tblPenggunaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblPenggunaMouseClicked
+        int selectedRow = tblPengguna.getSelectedRow();
+        if (selectedRow > -1) {
+            txtId.setText(tblPengguna.getValueAt(selectedRow, 0).toString());
+            txtPengguna.setText(tblPengguna.getValueAt(selectedRow, 1).toString());
+            txtUsername.setText(tblPengguna.getValueAt(selectedRow, 2).toString());
+            btnEdit.setEnabled(true);
+            btnHapus.setEnabled(true);
+            cmbPegawai.setEnabled(true);            
+        }
+    }//GEN-LAST:event_tblPenggunaMouseClicked
+
+    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
+        txtUsername.setEnabled(true);
+        txtPassword.setEnabled(true);
+        btnSimpan.setEnabled(true);
+        isEdit = true;
+    }//GEN-LAST:event_btnEditActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCari;
@@ -259,6 +358,7 @@ public class FormPengguna extends javax.swing.JDialog {
     private javax.swing.JButton btnResetCari;
     private javax.swing.JButton btnSimpan;
     private javax.swing.JButton btnTambah;
+    private javax.swing.JComboBox<String> cmbPegawai;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -269,8 +369,8 @@ public class FormPengguna extends javax.swing.JDialog {
     private javax.swing.JTable jTable1;
     private javax.swing.JTable tblPengguna;
     private javax.swing.JTextField txtCari;
+    private javax.swing.JTextField txtId;
     private javax.swing.JPasswordField txtPassword;
-    private javax.swing.JPasswordField txtPasswordKonfirmasi;
     private javax.swing.JTextField txtPengguna;
     private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
@@ -281,19 +381,60 @@ public class FormPengguna extends javax.swing.JDialog {
         swingUtil.setActive(false, txtPengguna, txtUsername);
         
         txtPassword.setEnabled(false);        
-        txtPasswordKonfirmasi.setEnabled(false);
+        txtId.setEnabled(false);
+        cmbPegawai.setEnabled(false);
         
         swingUtil.setActive(false, btnSimpan, btnEdit, btnHapus); 
         
         swingUtil.clearText(txtPengguna, txtUsername);
         txtPassword.setText("");
-        txtPasswordKonfirmasi.setText("");
+        txtId.setText("");
+        
+        tampilData();
+        isiCombo();
     }
 
     private void tampilData() {        
-        listPengguna.add(new Pengguna("Andi", "andi", "secret"));
-        listPengguna.add(new Pengguna("Abdullah", "abdul", "123456"));
+        listPengguna = new ArrayList<>();
         
-        tblPengguna.setModel(new TableModelPengguna(listPengguna));
+        Connection conn = DBConnection.getInstance().getConnection();
+        Statement st;
+        String sql = "SELECT u.*, nama FROM user u INNER JOIN pegawai p ON u.id_pegawai = p.id ORDER BY username ASC";
+        try {
+            st = conn.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            while (rs.next()) {
+                Pengguna user = new Pengguna(rs.getInt("id"), rs.getString("nama"), rs.getString("username"));
+                listPengguna.add(user);
+            }
+            tblPengguna.setModel(new TableModelPengguna(listPengguna));
+        } catch (SQLException ex) {
+            Logger.getLogger(FormPengguna.class.getName()).log(Level.SEVERE, null, ex);
+        }                       
+    }
+
+    private void isiCombo() {
+        String sql = "SELECT id FROM pegawai";
+        Connection conn = DBConnection.getInstance().getConnection();
+        try {
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            
+            int rowsCount = rs.last() ? rs.getRow() : 0;
+            rs.beforeFirst();
+            
+            String idPegawai[] = new String[rowsCount];
+            
+            int idx = 0;
+            while(rs.next()) {
+                idPegawai[idx] = rs.getInt("id") + "";
+                idx++;
+            }
+            
+            cmbPegawai.setModel(new DefaultComboBoxModel<>(idPegawai));
+        } catch (SQLException ex) {
+            Logger.getLogger(FormPengguna.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
     }
 }

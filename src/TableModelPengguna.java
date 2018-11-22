@@ -4,7 +4,7 @@ import javax.swing.table.AbstractTableModel;
 
 public class TableModelPengguna extends AbstractTableModel {
     private List<Pengguna> listPengguna;
-    private String[] columns = {"Nama Pengguna", "Username"};
+    private String[] columns = {"ID", "Nama Pengguna", "Username"};
 
     public TableModelPengguna(List<Pengguna> listPengguna) {
         this.listPengguna = listPengguna;
@@ -24,8 +24,9 @@ public class TableModelPengguna extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
-            case 0: return listPengguna.get(rowIndex).getNama();
-            case 1: return listPengguna.get(rowIndex).getUsername();
+            case 0: return listPengguna.get(rowIndex).getId();
+            case 1: return listPengguna.get(rowIndex).getNama();
+            case 2: return listPengguna.get(rowIndex).getUsername();
             default: return null;
         }
     }

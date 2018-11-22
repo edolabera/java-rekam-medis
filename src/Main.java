@@ -16,7 +16,7 @@ public class Main extends javax.swing.JFrame {
     FormPengguna frmPengguna;
     FormLogin frmLogin;
     
-    private static boolean loggedIn = false;
+    private static boolean loggedIn = true;
 
     public static boolean isLoggedIn() {
         return loggedIn;
